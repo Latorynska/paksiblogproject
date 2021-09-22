@@ -1,23 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import Blog from './Components/Homepage/Blog';
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import PublicRoute from './Components/Routes/PublicRoute';
+import PrivateRoute from './Components/Routes/PrivateRoute';
+import ccp from './Components/Content-control/ccp';
+import Login from './Components/Content-control/Login';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Switch>
+          <PublicRoute path="/" component={Blog} exact />
+          <PublicRoute path="/CCP-Login" component={Login} exact/>
+          <PrivateRoute path="/content-control" component={ccp} exact/>
+          <PrivateRoute path="/content-control/:page/:id?" component={ccp} exact/>
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 }
