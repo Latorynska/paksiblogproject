@@ -5,17 +5,17 @@ import 'firebase/auth';
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyCFDWJBM3Z-iOltHhaG--NVADSDrEQvTPU",
+  apiKey: "",
 
-  authDomain: "paksi-ringkang.firebaseapp.com",
+  authDomain: "",
 
-  projectId: "paksi-ringkang",
+  projectId: "",
 
-  storageBucket: "paksi-ringkang.appspot.com",
+  storageBucket: "",
 
-  messagingSenderId: "939168441804",
+  messagingSenderId: "",
 
-  appId: "1:939168441804:web:f07c82805ddef329be6969"
+  appId: ""
 
 };
 
