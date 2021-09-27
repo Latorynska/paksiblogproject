@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Markdown from './Markdown';
+import MainText from './MainText';
 
 function Main(props) {
   const { posts, title } = props;
@@ -23,6 +23,7 @@ function Main(props) {
         {title}
       </Typography>
       <Divider />
+      <MainText content={posts}/>
     </Grid>
   );
 }

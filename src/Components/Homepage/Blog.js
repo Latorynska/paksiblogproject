@@ -1,4 +1,7 @@
-import * as React from 'react';
+import React, { Component } from 'react';
+import { connect, useSelector } from 'react-redux';
+import { compose } from 'redux';
+import { firestoreConnect, isEmpty, isLoaded } from 'react-redux-firebase';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
@@ -13,21 +16,14 @@ import Main from './Main';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 import Image from '../../Assets/img/bg.png'
+import { getBanner } from '../../Store/Actions/BlogActions';
+import Loader from '../Layout/Loader';
 
 const sections = [
   { title: 'My Facebook Link', url: '#' },
   { title: 'My Youtube Link', url: '#' },
   { title: 'My Instagram Link', url: '#' },
 ];
-
-const mainFeaturedPost = {
-  title: 'Selamat Datang!',
-  description:
-    "Terimakasih telah berkunjung ke halaman web saya, semoga anda dapat menikmati tulisan-tulisan sederhana yang dapat saya sajikan",
-  image: Image,
-  imageText: 'main image description',
-  linkText: '#'
-};
 
 const featuredPosts = [
   {
@@ -50,9 +46,9 @@ const featuredPosts = [
 
 
 const sidebar = {
-  title: 'About',
+  title: 'Tentang Kami',
   description:
-    'Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.',
+    'Merupakan Website yang dibuat untuk memenuhi kebutuhan pendidikan sebagai seorang mahasiswa, dan hanya dikembangkan oleh satu orang disela-sela waktu luang',
   archives: [
     { title: 'March 2020', url: '#' },
     { title: 'February 2020', url: '#' },
@@ -79,36 +75,85 @@ const theme = createTheme({
     mode: 'dark',
   },
 });
+class Blog extends Component {
+  
+  render() {    
+    const { err, banner, loading, featured1} = this.props;
+    
 
-export default function Blog() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="lg">
-        <Header title="Paksi Ringkang" sections={sections} />
-        <main>
-          <MainFeaturedPost post={mainFeaturedPost} />
-          <Grid container spacing={4}>
-            {featuredPosts.map((post) => (
-              <FeaturedPost key={post.title} post={post} />
-            ))}
-          </Grid>
-          <Grid container spacing={5} sx={{ mt: 3 }}>
-            <Main title="From the firehose" posts={null} />
-            <Sidebar
-              title={sidebar.title}
-              description={sidebar.description}
-              archives={sidebar.archives}
-              social={sidebar.social}
-              theme={theme}
-            />
-          </Grid>
-        </main>
-      </Container>
-      <Footer
-        title="Lotarynska"
-        description="Hari demi Hari kita berjuang untuk masa depan"
-      />
-    </ThemeProvider>
-  );
+    if(isLoaded(banner) && !isEmpty(banner)){
+      
+      const mainFeaturedPost = {
+        title: banner.Title,
+        FullContent: banner.FullContent,
+        image: banner.ImageUrl,
+        imageText: 'main image',
+      };
+      return(
+          
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="lg">
+          <Header title="Paksi Ringkang" sections={sections} />
+          <main>
+            <MainFeaturedPost post={mainFeaturedPost} />
+            <Grid container spacing={4}>
+              {featuredPosts.map((post) => (
+                <FeaturedPost key={post.title} post={post} />
+              ))}
+            </Grid>
+            <Grid container spacing={5} sx={{ mt: 3 }}>
+                {
+                (isLoaded(featured1) && !isEmpty(featured1)) ? 
+                    <Main title="Konten Kami" posts={featured1} />
+                :
+                    <Loader />
+                }
+              <Sidebar
+                title={sidebar.title}
+                description={sidebar.description}
+                archives={sidebar.archives}
+                social={sidebar.social}
+                theme={theme}
+              />
+            </Grid>
+          </main>
+        </Container>
+        <Footer
+          title="Lotarynska"
+          description="Hari demi Hari kita berjuang untuk masa depan"
+        />
+      </ThemeProvider>
+      )
+    }
+    else{
+      return (
+        <Loader />
+      )
+    }
+  }
 }
+
+const mapStateToProps = (state) => {
+  const Contents = state.firestore.data.Contents;
+  const banner = Contents ? Contents["mainbanner"] : null;
+  const featured1 = Contents ? Contents["Da64YkisAkE46I5wSYwj"] : null;
+  return{
+    banner: banner,
+    loading: state.Blog.loading,
+    err: state.Blog.err,
+    featured1: featured1
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return{
+    getbanner: () => dispatch(getBanner())
+  }
+}
+
+export default compose(
+    connect(mapStateToProps,mapDispatchToProps),
+    firestoreConnect(() => [
+      { collection : "Contents"}
+    ])
+  )(Blog);

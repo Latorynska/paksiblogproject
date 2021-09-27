@@ -8,8 +8,9 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 
 const FeaturedContent = (props) => {
+  const { ID, Title, ShortDesc, ImageUrl, Description } = props.content;
   return (
-    <Grid item key={props.id} xs={12} sm={6} md={4}>
+    <Grid item key={ID} xs={12} sm={6} md={4}>
         <Typography>
           {props.section}
         </Typography>
@@ -23,16 +24,15 @@ const FeaturedContent = (props) => {
             width:'480px',
             height:'270px'
           }}
-          image="https://source.unsplash.com/random"
+          image={ImageUrl}
           alt="random"
         />
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography gutterBottom variant="h5" component="h2">
-            Heading
+            {Title}
           </Typography>
           <Typography>
-            This is a media card. You can use this section to describe the
-            content.
+            {ShortDesc ? ShortDesc : Description }
           </Typography>
         </CardContent>
         <CardActions>

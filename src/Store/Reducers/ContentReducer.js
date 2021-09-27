@@ -1,17 +1,24 @@
 const initState = {
     loading: false,
     err: null,
-    status: null,
+    status: false,
 }
 
-const PagingReducer = (state = initState, action) => {
+const ContentReducer = (state = initState, action) => {
     switch(action.type) {
         case 'SET_CONTENT' : 
             return {
                 ...state,
-                content: action.conten
+                content: action.content
             }
         case 'ADD_CONTENT' :
+            console.log("berhasil upload data!");
+            return {
+                ...state,
+                status: action.status
+            }
+        case 'UPDATE_CONTENT' : 
+            console.log("Update ", action.status);
             return {
                 ...state,
                 status: action.status
@@ -19,11 +26,17 @@ const PagingReducer = (state = initState, action) => {
         case 'SET_ERROR' : 
             return {
                 ...state,
-                err: action.err.message
+                status: false,
+                err: action.err
+            }
+        case 'SET_LOADING' : 
+            return {
+                ...state,
+                loading: action.loading
             }
         default: 
             return state
     }
 }
 
-export default PagingReducer;
+export default ContentReducer;

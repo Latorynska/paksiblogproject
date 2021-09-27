@@ -18,14 +18,16 @@ import Button from '@mui/material/Button';
 import Dashboard from './Dashboard';
 import { connect } from 'react-redux';
 import { signOut } from '../../../Store/Actions/AuthActions';
-import TambahContent from './TambahContentPage/TambahContent';
+import { getSingleContent } from '../../../Store/Actions/ContentActions';
+import PageTambahContent from './ManageContentPage/PageTambahContent';
+import { isLoaded } from 'react-redux-firebase';
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="#">
-        Your Website
+        Lotarynska
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -100,9 +102,15 @@ const CCPFrame = (props) =>{
         }
         case 'TambahContent': {
             return (
-                <TambahContent />
+                <PageTambahContent />
             )
         }
+        case 'EditContent': {
+          props.getTargetedContent(props.CID)
+          return (
+              isLoaded(props.td) ? <PageTambahContent CID={props.CID} /> : <Loader />
+          )
+      }
         case 'Edit' : {
           return(
             <div>
@@ -143,7 +151,6 @@ const CCPFrame = (props) =>{
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              {props.page}
             </Typography>
             <Button onClick={props.signOut}>Logout</Button>
             <IconButton color="inherit">
@@ -191,13 +198,15 @@ const CCPFrame = (props) =>{
 
 const mapStateToProps = (state, ownProps) =>{
   return{
-    page: ownProps.page
+    page: ownProps.page,
+    td: state.Content.content
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    signOut: () => dispatch(signOut())
+    signOut: () => dispatch(signOut()),
+    getTargetedContent: (CID) => dispatch(getSingleContent(CID))
   }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(CCPFrame);
