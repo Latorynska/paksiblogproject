@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -6,20 +6,40 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import { ClearContent } from '../../../../Store/Actions/ContentActions';
+import { connect, useSelector } from 'react-redux';
 
 const TambahContentForm = (props) => {
-  const [paragraphCount, setparagraphCount] = useState(props.FullContent ? props.FullContent.length :  0);
-  const [paragraphContent, setparagraphContent] = useState(props.FullContent? props.FullContent : []);
+  useEffect(() => {
+    return () => {
+    }
+  }, [])
+
+  const { content } = useSelector(state => state.Content);
+  
+  const [paragraphContent, setparagraphContent] = useState(props.FullContent ? props.FullContent : null);
+  const [Title, setTitle] = useState(content ? content.Title : "");
 
   const handleParagraphcontent = (e,c) => {
-    paragraphContent[c] = e;
-    props.handleFullContentChange(paragraphContent);
+    if(Array.isArray(paragraphContent)){
+      paragraphContent[c] = e;
+      props.handleFullContentChange(paragraphContent);
+    }
+    else{
+      props.handleFullContentChange(e);
+    }
   }
-  const handleParagraphCount = (e) => {
+
+  const handleParagraphCount = () => {
     // console.log(paragraphContent);
-    setparagraphCount(paragraphCount + 1);
-    setparagraphContent(paragraphContent.concat(paragraphCount));
+    setparagraphContent(paragraphContent.concat(paragraphContent.length + 1));
   }
+
+  const handletitlechange = (e) => {
+    props.handleTitleChange(e.currentTarget.value);
+    setTitle(e.currentTarget.value);
+  }
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -34,12 +54,12 @@ const TambahContentForm = (props) => {
             label="Title"
             fullWidth
             variant="standard"
-            value={props.Title}
-            onChange={(e) => {props.handleTitleChange(e.currentTarget.value)}}
+            value={Title}
+            onChange={(e) => {handletitlechange(e)}}
           />
         </Grid>
         <Grid item xs={12}>
-          {paragraphContent.length != 0 ? 
+          {paragraphContent.length != 0 && Array.isArray(paragraphContent) ? 
             paragraphContent.map((val,key) => {
               return(
                 <TextareaAutosize
@@ -58,6 +78,7 @@ const TambahContentForm = (props) => {
               minRows={6}
               aria-label="maximum height"
               placeholder="Maximum 4 rows"
+              defaultValue={ paragraphContent ? paragraphContent : ""}
               onChange={(e) => handleParagraphcontent(e.currentTarget.value,0)}
               style={{ width: '100%' }}
             />
@@ -81,5 +102,10 @@ const TambahContentForm = (props) => {
   );
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return{
+    clearcontent: () => dispatch(ClearContent()),
+  }
+}
 
-export default TambahContentForm;
+export default connect(null,mapDispatchToProps)(TambahContentForm);

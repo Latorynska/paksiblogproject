@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
+import moment from 'moment';
 
 function FeaturedPost(props) {
   const { post } = props;
@@ -16,13 +17,13 @@ function FeaturedPost(props) {
         <Card sx={{ display: 'flex' }}>
           <CardContent sx={{ flex: 1 }}>
             <Typography component="h2" variant="h5">
-              {post.title}
+              {post.Title}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              {post.date}
+              {post.updatedAt ? moment(post.updatedAt.toDate()).calendar() : moment(post.createdAt.toDate()).calendar()}
             </Typography>
             <Typography variant="subtitle1" paragraph>
-              {post.description}
+              {post.ShortDesc}
             </Typography>
             <Typography variant="subtitle1" color="primary">
               Lanjutkan Membaca.....
@@ -31,23 +32,13 @@ function FeaturedPost(props) {
           <CardMedia
             component="img"
             sx={{ width: 160, display: { xs: 'none', sm: 'block' } }}
-            image={post.image}
-            alt={post.imageLabel}
+            image={post.ImageUrl}
+            alt={post.ImageUrl}
           />
         </Card>
       </CardActionArea>
     </Grid>
   );
 }
-
-FeaturedPost.propTypes = {
-  post: PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    imageLabel: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 export default FeaturedPost;

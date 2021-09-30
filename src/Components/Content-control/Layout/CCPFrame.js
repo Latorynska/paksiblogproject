@@ -16,7 +16,7 @@ import NavBar from './NavBar';
 import Loader from '../../Layout/Loader';
 import Button from '@mui/material/Button';
 import Dashboard from './Dashboard';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { signOut } from '../../../Store/Actions/AuthActions';
 import { getSingleContent } from '../../../Store/Actions/ContentActions';
 import PageTambahContent from './ManageContentPage/PageTambahContent';
@@ -84,7 +84,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const CCPFrame = (props) =>{
   const [open, setOpen] = React.useState(true);
-  const { page } = props;
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -106,9 +105,9 @@ const CCPFrame = (props) =>{
             )
         }
         case 'EditContent': {
-          props.getTargetedContent(props.CID)
+          
           return (
-              isLoaded(props.td) ? <PageTambahContent CID={props.CID} /> : <Loader />
+              <PageTambahContent CID={props.CID} />
           )
       }
         case 'Edit' : {

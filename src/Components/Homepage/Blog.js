@@ -81,7 +81,7 @@ class Blog extends Component {
     const { err, banner, loading, featured1} = this.props;
     
 
-    if(isLoaded(banner) && !isEmpty(banner)){
+    if(isLoaded(banner) && !isEmpty(banner) && isLoaded(featured1)){
       
       const mainFeaturedPost = {
         title: banner.Title,
@@ -98,9 +98,8 @@ class Blog extends Component {
           <main>
             <MainFeaturedPost post={mainFeaturedPost} />
             <Grid container spacing={4}>
-              {featuredPosts.map((post) => (
-                <FeaturedPost key={post.title} post={post} />
-              ))}
+              <FeaturedPost key={featured1.Title} post={featured1} />
+              <FeaturedPost key={featured1.Title} post={featured1} />
             </Grid>
             <Grid container spacing={5} sx={{ mt: 3 }}>
                 {
@@ -134,10 +133,13 @@ class Blog extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   const Contents = state.firestore.data.Contents;
-  const banner = Contents ? Contents["mainbanner"] : null;
-  const featured1 = Contents ? Contents["Da64YkisAkE46I5wSYwj"] : null;
+  const ControlDisplay = state.firestore.data.ControlDisplay;
+  const featured1id = ControlDisplay ? ControlDisplay["Controller"].featured1 : "";
+  const bannerid = ControlDisplay ? ControlDisplay["Controller"].banner : "";
+  const banner = Contents ? Contents[bannerid] : null;
+  const featured1 = Contents ? Contents[featured1id] : null;
   return{
     banner: banner,
     loading: state.Blog.loading,
@@ -154,6 +156,7 @@ const mapDispatchToProps = (dispatch) => {
 export default compose(
     connect(mapStateToProps,mapDispatchToProps),
     firestoreConnect(() => [
-      { collection : "Contents"}
+      'Contents',
+      'ControlDisplay'
     ])
   )(Blog);

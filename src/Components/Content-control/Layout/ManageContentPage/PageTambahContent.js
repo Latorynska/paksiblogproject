@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { setError, TambahContent, getSingleContent, updateContent } from '../../../../Store/Actions/ContentActions';
+import { setError, TambahContent, getSingleContent, updateContent, ClearContent, setLoading } from '../../../../Store/Actions/ContentActions';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -31,19 +31,24 @@ const theme = createTheme();
 
 const PageTambahContent = (props) => {
   
-  const { TD, ContentLoading, ContentActionsStatus } = props;
-  const [Title, setTitle] = useState( TD ? `${TD.Title}` : "");
-  const [FullContent, setFullContent] = useState( TD? TD.FullContent : []);
-  const [ShortDesc, setShortDesc] = useState(TD ? `${TD.ShortDesc}` : "");
-  const [File, setFile] = useState(null);
   
   const dispatch = useDispatch();
   
   useEffect(() => {
+    props.setloading(true);
+    props.CID ? props.getTargetedContent(props.CID).then(()=>props.setloading(false)) : props.clearcontent();
     return () => {
-      dispatch(setError(null));
+      props.clearcontent();
     }
-  }, [dispatch])
+  }, []);
+  
+  const { TD, ContentActionsStatus, iserror } = props;
+  const ContentLoading = useSelector(state => state.Content.loading);
+  const [Title, setTitle] = useState( TD ? `${TD.Title}` : "");
+  const [FullContent, setFullContent] = useState( TD ? TD.FullContent : []);
+  const [ShortDesc, setShortDesc] = useState(TD ? TD.ShortDesc ? `${TD.ShortDesc}` : "" : "");
+  const [File, setFile] = useState(null);
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = {
@@ -52,22 +57,22 @@ const PageTambahContent = (props) => {
       content: FullContent,
     }
     console.log(data);
-    console.log(TD);
-    if(props.CID){
-      props.updateContent(props.CID,data);
-    }
-    else{
-      props.tambahContent(data);
-    }
+    // if(props.CID){
+    //   props.updateContent(props.CID,data);
+    //   props.seterror(null);
+    // }
+    // else{
+    //   props.tambahContent(data);
+    // }
   }
 
   const ContentisLoaded = () => {
     if(!ContentLoading){
       return (
         <TambahContentForm 
-          Title={TD ? Title : ""}
-          FullContent={TD ? FullContent : []}
-          ShortDesc={ShortDesc}
+          Title={TD ? TD.Title : ""}
+          FullContent={TD ? TD.FullContent : []}
+          ShortDesc={TD ? TD.ShortDesc : ""}
           handleTitleChange={(e) => {setTitle(e)}} 
           handleFullContentChange={(e) => {setFullContent(e)}}
           handleShortDescChange={(e)=>{setShortDesc(e)}}
@@ -82,6 +87,7 @@ const PageTambahContent = (props) => {
     }
   }
     return (
+      !ContentLoading ? 
         <React.Fragment>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
@@ -89,6 +95,7 @@ const PageTambahContent = (props) => {
                     <Typography component="h1" variant="h4" align="center">
                         {TD ? `Edit Content : ${TD.Title}` : "Tambah Content"}
                     </Typography>
+                    {iserror ? iserror : <></>}
                     <React.Fragment>
                         <React.Fragment>
                             {ContentisLoaded()}
@@ -107,6 +114,8 @@ const PageTambahContent = (props) => {
                     </Paper>
             </ThemeProvider>
         </React.Fragment>
+        : 
+        <Loader />
     )
 }
 
@@ -114,7 +123,8 @@ const mapStateToProps = (state,ownProps) => {
   return {
     TD: state.Content.content,
     ContentLoading: state.Content.loading,
-    ContentActionsStatus: state.Content.status
+    ContentActionsStatus: state.Content.status,
+    iserror: state.Content.err,
   }
 }
 
@@ -123,6 +133,9 @@ const mapDispatchToProps = (dispatch) => {
       tambahContent: (data) => dispatch(TambahContent(data)),
       updateContent: (CID,data) => dispatch(updateContent(CID,data)),
       getTargetedContent: (CID) => dispatch(getSingleContent(CID)),
+      clearcontent: () => dispatch(ClearContent()),
+      seterror: (status) => dispatch(setError(status)),
+      setloading: (load) => dispatch(setLoading(load))
     }
 }
 

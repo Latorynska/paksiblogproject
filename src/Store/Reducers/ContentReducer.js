@@ -1,7 +1,7 @@
 const initState = {
     loading: false,
     err: null,
-    status: false,
+    status: false
 }
 
 const ContentReducer = (state = initState, action) => {

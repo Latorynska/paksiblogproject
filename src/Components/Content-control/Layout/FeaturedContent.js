@@ -1,14 +1,18 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
+import { Link } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { useHistory } from 'react-router';
 
 const FeaturedContent = (props) => {
-  const { ID, Title, ShortDesc, ImageUrl, Description } = props.content;
+  const { Title, ShortDesc, ImageUrl, Description } = props.content;
+  const { ID } = props;
+  let history = useHistory();
   return (
     <Grid item key={ID} xs={12} sm={6} md={4}>
         <Typography>
@@ -36,8 +40,9 @@ const FeaturedContent = (props) => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">View</Button>
+          <Link to={'/content-control/EditContent/'+ID}>
           <Button size="small">Edit</Button>
+          </Link>
         </CardActions>
       </Card>
     </Grid>

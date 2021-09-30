@@ -89,7 +89,6 @@ function Header(props) {
                 underline="none"
                 variant="h5"
                 color="inherit"
-                align="Left"
                 noWrap
                 sx={{ flex: 1 }}
                 href="#"

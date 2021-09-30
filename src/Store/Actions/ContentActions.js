@@ -4,9 +4,22 @@ export const setError = (err) => {
         dispatch({type: 'SET_ERROR', err: err})
     }
 }
+export const ClearContent = () => {
+    return (dispatch) => {
+        dispatch({type: 'SET_LOADING', loading: true});
+        dispatch({type: 'SET_CONTENT', content: null});
+        dispatch({type: 'SET_LOADING', loading: false});
+    }   
+}
+export const setLoading = (load) => {
+    return async (dispatch) => {
+        dispatch({type: 'SET_LOADING', loading: load});
+    }
+}
 export const getSingleContent = (CID) => {
     return async (dispatch, getState, {getFirebase, getFirestore}) => {
         const firestore = getFirestore();
+        dispatch({type: 'SET_LOADING', loading: true});
         try{
             await firestore.collection("Contents").doc(CID).get().then((doc) => {
                 if(doc.exists){
@@ -14,18 +27,19 @@ export const getSingleContent = (CID) => {
                         type: 'SET_CONTENT',
                         content: doc.data()
                     })
-                    //console.log(doc.data());
                 }
                 else{
                     console.log("data tidak diterima");
                 }
                 
+                dispatch({type: 'SET_LOADING', loading: false});
             })
             // const snapshot = await firebase.firestore().collection('Contents').get();
             // console.log(snapshot.docs.map(doc => doc.data()));
         }
         catch(err){
             console.log(err);
+            dispatch({type: 'SET_LOADING', loading: false});
             dispatch({
                 type: 'SET_ERROR',
                 err: err.message
