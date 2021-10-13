@@ -57,13 +57,13 @@ const PageTambahContent = (props) => {
       content: FullContent,
     }
     console.log(data);
-    // if(props.CID){
-    //   props.updateContent(props.CID,data);
-    //   props.seterror(null);
-    // }
-    // else{
-    //   props.tambahContent(data);
-    // }
+    if(props.CID){
+      props.updateContent(props.CID,data);
+      props.seterror(null);
+    }
+    else{
+      props.tambahContent(data);
+    }
   }
 
   const ContentisLoaded = () => {
@@ -95,7 +95,7 @@ const PageTambahContent = (props) => {
                     <Typography component="h1" variant="h4" align="center">
                         {TD ? `Edit Content : ${TD.Title}` : "Tambah Content"}
                     </Typography>
-                    {iserror ? iserror : <></>}
+                    {iserror && iserror}
                     <React.Fragment>
                         <React.Fragment>
                             {ContentisLoaded()}

@@ -14,6 +14,7 @@ function App() {
           <PublicRoute path="/CCP-Login" component={Login} exact/>
           <PrivateRoute path="/content-control" component={ccp} exact/>
           <PrivateRoute path="/content-control/:page/:id?" component={ccp} exact/>
+          <PublicRoute path="/:CID" component={Blog} exact />
         </Switch>
       </BrowserRouter>
     </div>

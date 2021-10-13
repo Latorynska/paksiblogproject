@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -11,9 +10,21 @@ import moment from 'moment';
 function FeaturedPost(props) {
   const { post } = props;
 
+  const handleClick = (e) => {
+    e.preventDefault();
+    const anchor = (e.target.ownerDocument || document).querySelector(
+      '#maincontent',
+    );
+    if (anchor) {
+      anchor.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }
   return (
     <Grid item xs={12} md={6}>
-      <CardActionArea component="a" href="#">
+      <CardActionArea component="a" onClick={(e) => {props.onClick();handleClick(e)}}>
         <Card sx={{ display: 'flex' }}>
           <CardContent sx={{ flex: 1 }}>
             <Typography component="h2" variant="h5">

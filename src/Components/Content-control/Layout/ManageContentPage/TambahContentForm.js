@@ -1,24 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { ClearContent } from '../../../../Store/Actions/ContentActions';
 import { connect, useSelector } from 'react-redux';
 
 const TambahContentForm = (props) => {
-  useEffect(() => {
-    return () => {
-    }
-  }, [])
-
+  
   const { content } = useSelector(state => state.Content);
   
-  const [paragraphContent, setparagraphContent] = useState(props.FullContent ? props.FullContent : null);
+  const [paragraphContent, setparagraphContent] = useState(content ? content.FullContent : []);
   const [Title, setTitle] = useState(content ? content.Title : "");
+  const [ShortDesc, setShortDesc] = useState(content ? content.ShortDesc : null);
+
+  const fullC = useRef(null);
+  
+  useEffect(() => {
+    props.handleTitleChange(props.Title);
+    props.handleShortDescChange(props.ShortDesc);
+    props.handleFullContentChange(props.FullContent);
+    return () => {
+    }
+  }, [content])
+
 
   const handleParagraphcontent = (e,c) => {
     if(Array.isArray(paragraphContent)){
@@ -30,6 +40,17 @@ const TambahContentForm = (props) => {
     }
   }
 
+  const removeParag = (index) => {
+    let buffer = [];
+    paragraphContent.splice(index,1);
+    paragraphContent.map((val,key) =>{
+        buffer.push(val);
+        fullC.current.children[key].firstElementChild.value = val;
+    });
+    setparagraphContent(buffer);
+    props.handleFullContentChange(buffer);
+    //console.log(buffer);
+  }
   const handleParagraphCount = () => {
     // console.log(paragraphContent);
     setparagraphContent(paragraphContent.concat(paragraphContent.length + 1));
@@ -38,6 +59,10 @@ const TambahContentForm = (props) => {
   const handletitlechange = (e) => {
     props.handleTitleChange(e.currentTarget.value);
     setTitle(e.currentTarget.value);
+  }
+  const handleShortDescChange = (e) => {
+    props.handleShortDescChange(e.currentTarget.value);
+    setShortDesc(e.currentTarget.value)
   }
 
   return (
@@ -59,18 +84,26 @@ const TambahContentForm = (props) => {
           />
         </Grid>
         <Grid item xs={12}>
+          <div ref={fullC}>
           {paragraphContent.length != 0 && Array.isArray(paragraphContent) ? 
             paragraphContent.map((val,key) => {
               return(
-                <TextareaAutosize
-                  minRows={4}
-                  aria-label="maximum height"
-                  placeholder="Maximum 4 rows"
-                  key={`parag${key}`}
-                  defaultValue={val}
-                  onChange={(e) => handleParagraphcontent(e.currentTarget.value,key)}
-                  style={{ width: '100%' }}
-                />
+                <Box sx={{display:'flex'}}>
+                  <TextareaAutosize
+                    minRows={4}
+                    aria-label="maximum height"
+                    placeholder="Maximum 4 rows"
+                    key={`parag${key}`}
+                    defaultValue={val}
+                    onChange={(e) => handleParagraphcontent(e.currentTarget.value,key)}
+                    style={{ width: '100%' }}
+                  />
+                  <Tooltip title="Hapus Paragraph" placement="top">
+                    <IconButton aria-label="delete" color="error" sx={{height:'100%'}} onClick={()=>removeParag(key)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               )
             })
           :
@@ -83,7 +116,7 @@ const TambahContentForm = (props) => {
               style={{ width: '100%' }}
             />
           }
-            
+          </div>
           <Button variant="contained" sx={{float: 'right'}} onClick={() => handleParagraphCount()}>Add Paragraph</Button>
         </Grid>
         <Grid item xs={12}>
@@ -93,8 +126,8 @@ const TambahContentForm = (props) => {
             label="Short Description"
             fullWidth
             variant="standard"
-            value={props.ShortDesc}
-            onChange={(e) => {props.handleShortDescChange(e.currentTarget.value)}}
+            value={ShortDesc}
+            onChange={(e) => {handleShortDescChange(e)}}
           />
         </Grid>
       </Grid>

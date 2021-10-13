@@ -8,7 +8,6 @@ const MainText = (props) => {
     return (
         <React.Fragment>
             <Typography variant="h5" gutterBottom>
-                {console.log(content)}
                 {content.Title}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">

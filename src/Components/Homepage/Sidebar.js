@@ -7,8 +7,31 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import { ThemeProvider } from '@mui/material/styles';
 
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase';
+import Loader from '../Layout/Loader';
+
 function Sidebar(props) {
-  const { archives, description, social, title } = props;
+  const { description, social, title, contents } = props;
+
+  const handleClick = (e,data) => {
+    e.preventDefault();
+    const anchor = (e.target.ownerDocument || document).querySelector(
+      '#maincontent',
+    );
+    if (anchor) {
+      anchor.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+    setTimeout(function() {
+      
+      props.changeActiveContent(data);
+    }, 250);
+    
+  }
 
   return (
       <Grid item xs={12} md={4}>
@@ -24,11 +47,21 @@ function Sidebar(props) {
         <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
           Archives
         </Typography>
-        {/* {archives.map((archive) => (
-          <Link display="block" variant="body1" href={archive.url} key={archive.title}>
-            {archive.title}
+        {contents ? contents.map((archive,index) => (
+          archive ? 
+          <Link 
+            display="block"
+            underline="none"
+            href="#"
+            onClick={(e) => {handleClick(e,archive[1])}} key={archive[0]}
+            >
+            {archive[1].Title}
           </Link>
-        ))} */}
+          : <></>
+        )) :
+          <Loader />
+          
+        }
 
         <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
           Social
@@ -53,12 +86,6 @@ function Sidebar(props) {
 }
 
 Sidebar.propTypes = {
-  archives: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
   description: PropTypes.string.isRequired,
   social: PropTypes.arrayOf(
     PropTypes.shape({
@@ -69,4 +96,14 @@ Sidebar.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-export default Sidebar;
+const mapStateToProps = (state) => {
+  const Contents = state.firestore.data.Contents;
+  const finalC = Object.entries(Contents).filter(value => value[0] != "mainbanner");
+  return {
+    contents : finalC
+  }
+}
+
+export default compose(connect(mapStateToProps), firestoreConnect(() => [
+  {collection :'Contents'}
+]))(Sidebar);

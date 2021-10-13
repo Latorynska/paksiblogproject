@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect, useSelector } from 'react-redux';
+import React, { Component, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect, isEmpty, isLoaded } from 'react-redux-firebase';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -76,13 +76,21 @@ const theme = createTheme({
   },
 });
 class Blog extends Component {
-  
+
+  constructor(props){
+    super(props);
+    this.state = {
+      activeContent: ''
+    }
+  }
+  changeActiveContent = (e) => {
+    this.setState({activeContent: e});
+  }
   render() {    
-    const { err, banner, loading, featured1} = this.props;
+    const { err, banner, loading, featured1, featured2, contents } = this.props;
     
 
     if(isLoaded(banner) && !isEmpty(banner) && isLoaded(featured1)){
-      
       const mainFeaturedPost = {
         title: banner.Title,
         FullContent: banner.FullContent,
@@ -98,23 +106,24 @@ class Blog extends Component {
           <main>
             <MainFeaturedPost post={mainFeaturedPost} />
             <Grid container spacing={4}>
-              <FeaturedPost key={featured1.Title} post={featured1} />
-              <FeaturedPost key={featured1.Title} post={featured1} />
+              <FeaturedPost key={featured1.Title} post={featured1} onClick={()=> {this.changeActiveContent(featured1)}} />
+              <FeaturedPost key={featured2.Title} post={featured2} onClick={()=> {this.changeActiveContent(featured2)}} />
             </Grid>
+            <div id="maincontent"></div>
             <Grid container spacing={5} sx={{ mt: 3 }}>
                 {
                 (isLoaded(featured1) && !isEmpty(featured1)) ? 
-                    <Main title="Konten Kami" posts={featured1} />
+                    <Main title="Konten Kami" posts={this.state.activeContent ? this.state.activeContent : this.props.match.params.CID ? contents[this.props.match.params.CID] : featured2} />
                 :
                     <Loader />
                 }
-              <Sidebar
-                title={sidebar.title}
-                description={sidebar.description}
-                archives={sidebar.archives}
-                social={sidebar.social}
-                theme={theme}
-              />
+                  <Sidebar
+                    title={sidebar.title}
+                    description={sidebar.description}
+                    social={sidebar.social}
+                    changeActiveContent={(x) => {this.changeActiveContent(x)}}
+                    theme={theme}
+                  />
             </Grid>
           </main>
         </Container>
@@ -137,14 +146,18 @@ const mapStateToProps = (state, ownProps) => {
   const Contents = state.firestore.data.Contents;
   const ControlDisplay = state.firestore.data.ControlDisplay;
   const featured1id = ControlDisplay ? ControlDisplay["Controller"].featured1 : "";
+  const featured2id = ControlDisplay ? ControlDisplay["Controller"].featured2 : "";
   const bannerid = ControlDisplay ? ControlDisplay["Controller"].banner : "";
   const banner = Contents ? Contents[bannerid] : null;
   const featured1 = Contents ? Contents[featured1id] : null;
+  const featured2 = Contents ? Contents[featured2id] : null;
   return{
     banner: banner,
     loading: state.Blog.loading,
     err: state.Blog.err,
-    featured1: featured1
+    featured1: featured1,
+    featured2: featured2,
+    contents: Contents
   }
 }
 const mapDispatchToProps = (dispatch) => {
